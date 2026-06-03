@@ -1,5 +1,13 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Auth Validation Rules
+
+The login/signup screen in `src/app/login/page.tsx` enforces:
+
+- Email: required, valid format.
+- Password: required, `8-64` chars, must include letters and numbers, no spaces.
+- Name (signup): required.
+
 ## Getting Started
 
 First, run the development server:

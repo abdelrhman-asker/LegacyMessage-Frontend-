@@ -1,6 +1,7 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import { Cormorant_Garamond, Inter } from "next/font/google";
 import GlobalNavbar from "@/components/GlobalNavbar";
+import { I18nProvider } from "@/i18n/I18nProvider";
 import "./globals.css";
 
 const cormorant = Cormorant_Garamond({
@@ -31,10 +32,11 @@ export default function RootLayout({
       className={`${cormorant.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <GlobalNavbar />
-        {children}
+        <I18nProvider>
+          <GlobalNavbar />
+          {children}
+        </I18nProvider>
       </body>
     </html>
   );
 }
-

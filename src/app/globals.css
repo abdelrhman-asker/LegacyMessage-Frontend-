@@ -160,6 +160,52 @@ button.ghost { background: transparent; border: 1px solid rgba(255, 255, 255, 0.
   .nav-link-item { font-size: 1rem; width: 100%; padding: 0.55rem 0.6rem; }
   .login-btn { font-size: 1rem; width: 100%; padding: 0.65rem 0.6rem; }
 
-  .nav-link-item[href="/"]::after { left: 0.6rem; right: auto; width: 3.2rem; }
+  [dir=rtl] .nav-link-item[href="/"]::after { left: auto; right: 0.6rem; width: 3.2rem; }
+  [dir=ltr] .nav-link-item[href="/"]::after { left: 0.6rem; right: auto; width: 3.2rem; }
   .login-btn { justify-content: center; }
+}
+
+.lang-toggle {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #d7c3ad;
+  border-radius: 999px;
+  background: #f7ebdd;
+  overflow: hidden;
+  padding: 0.15rem;
+  cursor: pointer;
+}
+
+.lang-pill {
+  border: 0;
+  background: transparent;
+  color: #4b2e21;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.32rem 0.6rem;
+  border-radius: 999px;
+  min-width: 2.2rem;
+  text-align: center;
+}
+
+.lang-pill.active {
+  background: #2f1f14;
+  color: #fff;
+}
+
+html[dir="rtl"] .top-nav,
+html[dir="rtl"] .nav-head,
+html[dir="rtl"] .nav-links {
+  direction: rtl;
+}
+
+@media (max-width: 700px) {
+  .lang-toggle {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .lang-pill {
+    flex: 1;
+  }
 }
