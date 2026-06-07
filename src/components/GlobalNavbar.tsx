@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import MainLogo from "@/../public/MainLogo.svg";
+import MainLogo from "@/../public/d.svg";
 import { type Locale } from "@/i18n/config";
 import { useI18n } from "@/i18n/I18nProvider";
 

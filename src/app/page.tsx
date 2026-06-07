@@ -59,7 +59,8 @@ export default function Home() {
         <section id="mission" className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="rounded-3xl border border-[#e3d4c3] bg-[#fffaf4] p-6 shadow-[0_18px_50px_rgba(54,30,12,0.08)] sm:p-9">
             <h2 className="text-3xl font-semibold text-[#2b1c13] sm:text-4xl">{t("home.missionTitle")}</h2>
-            <p className="mt-4 max-w-[70ch] text-sm leading-7 text-[#625141] sm:text-base">{t("home.missionBody")}</p>
+            <p className="mt-4 text-justify text-sm leading-7 text-[#625141] sm:text-base">{t("home.missionBody")}</p>
+            <p className="mt-4 text-justify text-sm leading-7 text-[#625141] sm:text-base">{t("home.missionBody2")}</p>
             <div className="mt-7 grid gap-4 sm:grid-cols-3">
               <article className="rounded-2xl border border-[#eadcca] bg-white p-4">
                 <h3 className="font-semibold text-[#362318]">{t("home.pillarIntentTitle")}</h3>
@@ -92,8 +93,8 @@ export default function Home() {
                 <li>{t("home.plan1Feature3")}</li>
               </ul>
             </article>
-            <article className="rounded-3xl border-2 border-[#5a2b1d] bg-[#fffaf5] p-6 shadow-[0_16px_34px_rgba(65,34,20,0.12)]">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#7a3124]">{t("home.plan2Badge")}</p>
+            <article className="relative rounded-3xl border-2 border-[#5a2b1d] bg-[#fffaf5] p-6 shadow-[0_16px_34px_rgba(65,34,20,0.12)]">
+              <p className="absolute right-4 mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#7a3124]">{t("home.plan2Badge")}</p>
               <h3 className="text-xl font-semibold text-[#2a1a12]">{t("home.plan2Title")}</h3>
               <p className="mt-1 text-xs uppercase tracking-[0.12em] text-[#866247]">{t("home.plan2Tag")}</p>
               <ul className="mt-4 space-y-2 text-sm text-[#5f4b3c]">
