@@ -193,24 +193,26 @@ export default function DashboardPage() {
       });
 
       if (data.status === 'accepted' && data.friend) {
+        const acceptedFriend = data.friend;
         setFriends((current) => {
           const withoutDuplicate = current.filter(
-            (friend) => friend.id !== data.friend?.id,
+            (friend) => friend.id !== acceptedFriend.id,
           );
-          return [data.friend, ...withoutDuplicate];
+          return [acceptedFriend, ...withoutDuplicate];
         });
-        setSelectedFriendId(data.friend.id);
-        setFriendStatus(`${data.friend.name} accepted your request.`);
+        setSelectedFriendId(acceptedFriend.id);
+        setFriendStatus(`${acceptedFriend.name} accepted your request.`);
       }
 
       if (data.status === 'pending' && data.request) {
+        const pendingRequest = data.request;
         setOutgoingRequests((current) => {
           const withoutDuplicate = current.filter(
-            (request) => request.id !== data.request?.id,
+            (request) => request.id !== pendingRequest.id,
           );
-          return [data.request, ...withoutDuplicate];
+          return [pendingRequest, ...withoutDuplicate];
         });
-        setFriendStatus(`Request sent to ${data.request.user.name}.`);
+        setFriendStatus(`Request sent to ${pendingRequest.user.name}.`);
       }
 
       setFriendIdentifier('');
@@ -243,14 +245,15 @@ export default function DashboardPage() {
       );
 
       if (action === 'accept' && data.friend) {
+        const acceptedFriend = data.friend;
         setFriends((current) => {
           const withoutDuplicate = current.filter(
-            (friend) => friend.id !== data.friend?.id,
+            (friend) => friend.id !== acceptedFriend.id,
           );
-          return [data.friend, ...withoutDuplicate];
+          return [acceptedFriend, ...withoutDuplicate];
         });
-        setSelectedFriendId(data.friend.id);
-        setFriendStatus(`${data.friend.name} is now a friend.`);
+        setSelectedFriendId(acceptedFriend.id);
+        setFriendStatus(`${acceptedFriend.name} is now a friend.`);
       } else {
         setFriendStatus(`Request from ${request.user.name} declined.`);
       }
