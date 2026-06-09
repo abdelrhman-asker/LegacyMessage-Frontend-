@@ -1,5 +1,5 @@
 const API_URL =
-  (process.env.NEXT_PUBLIC_API_URL || 'https://d4n67bdt-3001.uks1.devtunnels.ms')
+  (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000')
     .replace(/\/+$/, ''); // remove trailing slash
 
 export async function apiRequest<T>(
