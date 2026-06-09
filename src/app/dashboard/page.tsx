@@ -25,6 +25,19 @@ type Friend = {
   friendSince: string;
 };
 
+type FriendRequest = {
+  id: string;
+  status: 'PENDING' | 'ACCEPTED' | 'DECLINED';
+  direction: 'incoming' | 'outgoing';
+  createdAt: string;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    username: string;
+  };
+};
+
 type Message = {
   id: string;
   title: string;
@@ -32,6 +45,8 @@ type Message = {
   status: string;
   releaseType: string;
   createdAt: string;
+  readAt?: string | null;
+  unread: boolean;
   direction: 'sent' | 'received';
   sender: {
     id: string;
@@ -49,10 +64,14 @@ type Message = {
 
 type FriendsResponse = {
   friends: Friend[];
+  incomingRequests: FriendRequest[];
+  outgoingRequests: FriendRequest[];
 };
 
 type AddFriendResponse = {
-  friend: Friend;
+  status: 'pending' | 'accepted';
+  friend?: Friend;
+  request?: FriendRequest;
 };
 
 type MessagesResponse = {
@@ -66,12 +85,24 @@ type SendMessageResponse = {
   } | null;
 };
 
+type FriendRequestActionResponse = {
+  status: 'accepted' | 'declined';
+  friend?: Friend;
+  request?: FriendRequest;
+};
+
+type MarkReadResponse = {
+  message: Message;
+};
+
 export default function DashboardPage() {
   const router = useRouter();
   const { t } = useI18n();
 
   const [user, setUser] = useState<MeResponse['user'] | null>(null);
   const [friends, setFriends] = useState<Friend[]>([]);
+  const [incomingRequests, setIncomingRequests] = useState<FriendRequest[]>([]);
+  const [outgoingRequests, setOutgoingRequests] = useState<FriendRequest[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [selectedFriendId, setSelectedFriendId] = useState('');
   const [friendIdentifier, setFriendIdentifier] = useState('');
@@ -80,7 +111,9 @@ export default function DashboardPage() {
   const [messageContent, setMessageContent] = useState('');
   const [messageStatus, setMessageStatus] = useState('');
   const [friendLoading, setFriendLoading] = useState(false);
+  const [requestActionId, setRequestActionId] = useState('');
   const [messageLoading, setMessageLoading] = useState(false);
+  const [readLoadingId, setReadLoadingId] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -97,6 +130,8 @@ export default function DashboardPage() {
         if (mounted) {
           setUser(meData.user);
           setFriends(friendsData.friends);
+          setIncomingRequests(friendsData.incomingRequests);
+          setOutgoingRequests(friendsData.outgoingRequests);
           setMessages(messagesData.messages);
           setSelectedFriendId((current) => current || friendsData.friends[0]?.id || '');
         }
@@ -136,6 +171,7 @@ export default function DashboardPage() {
   }, [messages, selectedFriendId]);
 
   const creditBalance = user?.credits?.balance ?? 0;
+  const unreadCount = messages.filter((message) => message.unread).length;
   const canSendMessage =
     Boolean(selectedFriendId) && messageContent.trim().length > 0 && creditBalance > 0;
 
@@ -156,21 +192,74 @@ export default function DashboardPage() {
         body: JSON.stringify({ identifier: friendIdentifier }),
       });
 
-      setFriends((current) => {
-        const withoutDuplicate = current.filter(
-          (friend) => friend.id !== data.friend.id,
-        );
-        return [data.friend, ...withoutDuplicate];
-      });
-      setSelectedFriendId(data.friend.id);
+      if (data.status === 'accepted' && data.friend) {
+        setFriends((current) => {
+          const withoutDuplicate = current.filter(
+            (friend) => friend.id !== data.friend?.id,
+          );
+          return [data.friend, ...withoutDuplicate];
+        });
+        setSelectedFriendId(data.friend.id);
+        setFriendStatus(`${data.friend.name} accepted your request.`);
+      }
+
+      if (data.status === 'pending' && data.request) {
+        setOutgoingRequests((current) => {
+          const withoutDuplicate = current.filter(
+            (request) => request.id !== data.request?.id,
+          );
+          return [data.request, ...withoutDuplicate];
+        });
+        setFriendStatus(`Request sent to ${data.request.user.name}.`);
+      }
+
       setFriendIdentifier('');
-      setFriendStatus(`${data.friend.name} is now a friend.`);
     } catch (error) {
       setFriendStatus(
         error instanceof Error ? error.message : 'Could not add friend.',
       );
     } finally {
       setFriendLoading(false);
+    }
+  }
+
+  async function handleRequestAction(
+    request: FriendRequest,
+    action: 'accept' | 'decline',
+  ) {
+    setFriendStatus('');
+    setRequestActionId(request.id);
+
+    try {
+      const data = await apiRequest<FriendRequestActionResponse>(
+        `/friends/requests/${request.id}/${action}`,
+        {
+          method: 'POST',
+        },
+      );
+
+      setIncomingRequests((current) =>
+        current.filter((currentRequest) => currentRequest.id !== request.id),
+      );
+
+      if (action === 'accept' && data.friend) {
+        setFriends((current) => {
+          const withoutDuplicate = current.filter(
+            (friend) => friend.id !== data.friend?.id,
+          );
+          return [data.friend, ...withoutDuplicate];
+        });
+        setSelectedFriendId(data.friend.id);
+        setFriendStatus(`${data.friend.name} is now a friend.`);
+      } else {
+        setFriendStatus(`Request from ${request.user.name} declined.`);
+      }
+    } catch (error) {
+      setFriendStatus(
+        error instanceof Error ? error.message : 'Could not update request.',
+      );
+    } finally {
+      setRequestActionId('');
     }
   }
 
@@ -224,6 +313,36 @@ export default function DashboardPage() {
     }
   }
 
+  async function handleMarkRead(message: Message) {
+    if (!message.unread || message.direction !== 'received') {
+      return;
+    }
+
+    setReadLoadingId(message.id);
+
+    try {
+      const data = await apiRequest<MarkReadResponse>(
+        `/messages/${message.id}/read`,
+        {
+          method: 'POST',
+        },
+      );
+
+      setMessages((current) =>
+        current.map((currentMessage) =>
+          currentMessage.id === message.id ? data.message : currentMessage,
+        ),
+      );
+    } catch (error) {
+      setMessageStatus(
+        error instanceof Error ? error.message : 'Could not mark message read.',
+      );
+    } finally {
+      setReadLoadingId('');
+    }
+  }
+
+
   if (loading) {
     return (
       <main className="min-h-screen flex items-center justify-center">
@@ -247,12 +366,19 @@ export default function DashboardPage() {
           </button>
         </div>
 
-        <div className="grid gap-5 lg:grid-cols-[320px_1fr]">
+        <div className="grid gap-5 lg:grid-cols-[340px_1fr]">
           <section className="rounded-lg border border-[#dfd2c7] bg-white p-5 shadow-sm">
-            <div className="mb-5">
-              <p className="text-sm text-gray-500">{t('dashboard.credits')}</p>
-              <h2 className="text-4xl font-bold text-[#231815]">{creditBalance}</h2>
-              <p className="text-sm text-gray-500">1 message = 1 credit</p>
+            <div className="mb-5 grid grid-cols-2 gap-3">
+              <div className="rounded-lg border border-[#eadfd5] bg-[#fffdfb] p-3">
+                <p className="text-sm text-gray-500">{t('dashboard.credits')}</p>
+                <h2 className="text-3xl font-bold text-[#231815]">{creditBalance}</h2>
+                <p className="text-xs text-gray-500">1 message = 1 credit</p>
+              </div>
+              <div className="rounded-lg border border-[#eadfd5] bg-[#fff8f2] p-3">
+                <p className="text-sm text-gray-500">Unread</p>
+                <h2 className="text-3xl font-bold text-[#612014]">{unreadCount}</h2>
+                <p className="text-xs text-gray-500">new messages</p>
+              </div>
             </div>
 
             <form className="space-y-3" onSubmit={handleAddFriend}>
@@ -272,12 +398,65 @@ export default function DashboardPage() {
                 disabled={friendLoading}
                 className="buttonMain w-full rounded-lg px-4 py-2 disabled:opacity-60"
               >
-                {friendLoading ? 'Adding...' : 'Add friend'}
+                {friendLoading ? 'Sending...' : 'Send request'}
               </button>
               {friendStatus ? (
                 <p className="text-sm text-[#612014]">{friendStatus}</p>
               ) : null}
             </form>
+
+            <div className="mt-6 space-y-2">
+              <h3 className="text-sm font-semibold uppercase text-gray-500">
+                Requests
+              </h3>
+              {incomingRequests.length === 0 && outgoingRequests.length === 0 ? (
+                <p className="rounded-lg border border-dashed border-[#d8c6b5] p-3 text-sm text-gray-500">
+                  No pending requests.
+                </p>
+              ) : null}
+              {incomingRequests.map((request) => (
+                <div
+                  key={request.id}
+                  className="rounded-lg border border-[#612014] bg-[#fff8f2] p-3"
+                >
+                  <p className="text-sm font-semibold text-[#231815]">
+                    {request.user.name}
+                  </p>
+                  <p className="text-xs text-gray-500">@{request.user.username}</p>
+                  <div className="mt-3 grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleRequestAction(request, 'accept')}
+                      disabled={requestActionId === request.id}
+                      className="rounded-lg bg-[#1f6f43] px-3 py-2 text-sm font-semibold text-white disabled:opacity-60"
+                    >
+                      Accept
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleRequestAction(request, 'decline')}
+                      disabled={requestActionId === request.id}
+                      className="rounded-lg border border-[#d8c6b5] px-3 py-2 text-sm font-semibold text-[#612014] disabled:opacity-60"
+                    >
+                      Decline
+                    </button>
+                  </div>
+                </div>
+              ))}
+              {outgoingRequests.map((request) => (
+                <div
+                  key={request.id}
+                  className="rounded-lg border border-[#eadfd5] bg-[#fffdfb] p-3"
+                >
+                  <p className="text-sm font-semibold text-[#231815]">
+                    {request.user.name}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Pending acceptance from @{request.user.username}
+                  </p>
+                </div>
+              ))}
+            </div>
 
             <div className="mt-6 space-y-2">
               <h3 className="text-sm font-semibold uppercase text-gray-500">
@@ -314,6 +493,11 @@ export default function DashboardPage() {
                 <h2 className="text-xl font-bold text-[#231815]">
                   {selectedFriend ? selectedFriend.name : 'All messages'}
                 </h2>
+                {unreadCount > 0 ? (
+                  <p className="mt-1 text-sm font-semibold text-[#612014]">
+                    {unreadCount} unread message{unreadCount === 1 ? '' : 's'}
+                  </p>
+                ) : null}
               </div>
 
               <select
@@ -374,11 +558,22 @@ export default function DashboardPage() {
                 visibleMessages.map((message) => (
                   <article
                     key={message.id}
-                    className="rounded-lg border border-[#eadfd5] bg-[#fffdfb] p-4"
+                    className={`rounded-lg border p-4 transition ${
+                      message.unread
+                        ? 'border-[#612014] bg-[#fff8f2] shadow-[0_10px_28px_rgba(97,32,20,0.10)]'
+                        : 'border-[#eadfd5] bg-[#fffdfb]'
+                    }`}
                   >
                     <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
                       <div>
-                        <h4 className="font-semibold text-[#231815]">{message.title}</h4>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h4 className="font-semibold text-[#231815]">{message.title}</h4>
+                          {message.unread ? (
+                            <span className="rounded-full bg-[#612014] px-2 py-0.5 text-xs font-semibold text-white">
+                              New
+                            </span>
+                          ) : null}
+                        </div>
                         <p className="text-sm text-gray-500">
                           {message.direction === 'sent' ? 'To' : 'From'}{' '}
                           {message.direction === 'sent'
@@ -393,6 +588,16 @@ export default function DashboardPage() {
                     <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-gray-700">
                       {message.content}
                     </p>
+                    {message.unread ? (
+                      <button
+                        type="button"
+                        onClick={() => handleMarkRead(message)}
+                        disabled={readLoadingId === message.id}
+                        className="mt-3 rounded-lg border border-[#612014] px-3 py-2 text-sm font-semibold text-[#612014] disabled:opacity-60"
+                      >
+                        {readLoadingId === message.id ? 'Updating...' : 'Mark as read'}
+                      </button>
+                    ) : null}
                   </article>
                 ))
               )}
