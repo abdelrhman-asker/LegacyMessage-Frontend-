@@ -95,6 +95,8 @@ type MarkReadResponse = {
   message: Message;
 };
 
+type DashboardTab = 'messages' | 'friends' | 'requests';
+
 export default function DashboardPage() {
   const router = useRouter();
   const { t } = useI18n();
@@ -110,6 +112,7 @@ export default function DashboardPage() {
   const [messageTitle, setMessageTitle] = useState('');
   const [messageContent, setMessageContent] = useState('');
   const [messageStatus, setMessageStatus] = useState('');
+  const [activeTab, setActiveTab] = useState<DashboardTab>('messages');
   const [friendLoading, setFriendLoading] = useState(false);
   const [requestActionId, setRequestActionId] = useState('');
   const [messageLoading, setMessageLoading] = useState(false);
@@ -151,6 +154,40 @@ export default function DashboardPage() {
       mounted = false;
     };
   }, [router]);
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function refreshFriendRequests() {
+      try {
+        const friendsData = await apiRequest<FriendsResponse>('/friends');
+        if (!mounted) {
+          return;
+        }
+        setFriends(friendsData.friends);
+        setIncomingRequests(friendsData.incomingRequests);
+        setOutgoingRequests(friendsData.outgoingRequests);
+        setSelectedFriendId((current) => current || friendsData.friends[0]?.id || '');
+      } catch {
+        // Dashboard auth guard handles session failures on primary loads.
+      }
+    }
+
+    const interval = window.setInterval(refreshFriendRequests, 15000);
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        refreshFriendRequests();
+      }
+    };
+
+    document.addEventListener('visibilitychange', onVisibilityChange);
+
+    return () => {
+      mounted = false;
+      window.clearInterval(interval);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+    };
+  }, []);
 
   const selectedFriend = useMemo(
     () => friends.find((friend) => friend.id === selectedFriendId) || null,
@@ -213,6 +250,7 @@ export default function DashboardPage() {
           return [pendingRequest, ...withoutDuplicate];
         });
         setFriendStatus(`Request sent to ${pendingRequest.user.name}.`);
+        setActiveTab('requests');
       }
 
       setFriendIdentifier('');
@@ -254,6 +292,7 @@ export default function DashboardPage() {
         });
         setSelectedFriendId(acceptedFriend.id);
         setFriendStatus(`${acceptedFriend.name} is now a friend.`);
+        setActiveTab('messages');
       } else {
         setFriendStatus(`Request from ${request.user.name} declined.`);
       }
@@ -369,24 +408,50 @@ export default function DashboardPage() {
           </button>
         </div>
 
+        {incomingRequests.length > 0 ? (
+          <button
+            type="button"
+            onClick={() => setActiveTab('requests')}
+            className="flex w-full flex-col gap-1 rounded-lg border border-[#612014] bg-[#fff8f2] p-4 text-left shadow-sm sm:flex-row sm:items-center sm:justify-between"
+          >
+            <span>
+              <span className="block text-sm font-bold text-[#612014]">
+                New friend request{incomingRequests.length === 1 ? '' : 's'}
+              </span>
+              <span className="block text-sm text-[#604b3d]">
+                {incomingRequests[0]?.user.name}
+                {incomingRequests.length > 1 ? ` and ${incomingRequests.length - 1} more` : ''} want to connect.
+              </span>
+            </span>
+            <span className="rounded-full bg-[#612014] px-3 py-1 text-xs font-semibold text-white">
+              Review
+            </span>
+          </button>
+        ) : null}
+
         <div className="grid gap-5 lg:grid-cols-[340px_1fr]">
           <section className="rounded-lg border border-[#dfd2c7] bg-white p-5 shadow-sm">
-            <div className="mb-5 grid grid-cols-2 gap-3">
+            <div className="mb-5 grid grid-cols-3 gap-3">
               <div className="rounded-lg border border-[#eadfd5] bg-[#fffdfb] p-3">
                 <p className="text-sm text-gray-500">{t('dashboard.credits')}</p>
-                <h2 className="text-3xl font-bold text-[#231815]">{creditBalance}</h2>
+                <h2 className="text-2xl font-bold text-[#231815]">{creditBalance}</h2>
                 <p className="text-xs text-gray-500">1 message = 1 credit</p>
               </div>
               <div className="rounded-lg border border-[#eadfd5] bg-[#fff8f2] p-3">
                 <p className="text-sm text-gray-500">Unread</p>
-                <h2 className="text-3xl font-bold text-[#612014]">{unreadCount}</h2>
+                <h2 className="text-2xl font-bold text-[#612014]">{unreadCount}</h2>
                 <p className="text-xs text-gray-500">new messages</p>
+              </div>
+              <div className="rounded-lg border border-[#eadfd5] bg-[#fffdfb] p-3">
+                <p className="text-sm text-gray-500">Requests</p>
+                <h2 className="text-2xl font-bold text-[#231815]">{incomingRequests.length}</h2>
+                <p className="text-xs text-gray-500">waiting</p>
               </div>
             </div>
 
-            <form className="space-y-3" onSubmit={handleAddFriend}>
+            <form className="space-y-3 rounded-lg border border-[#eadfd5] bg-[#fffdfb] p-4" onSubmit={handleAddFriend}>
               <label className="block text-sm font-semibold text-gray-700" htmlFor="friendIdentifier">
-                Add friend
+                Send friend request
               </label>
               <input
                 id="friendIdentifier"
@@ -410,60 +475,7 @@ export default function DashboardPage() {
 
             <div className="mt-6 space-y-2">
               <h3 className="text-sm font-semibold uppercase text-gray-500">
-                Requests
-              </h3>
-              {incomingRequests.length === 0 && outgoingRequests.length === 0 ? (
-                <p className="rounded-lg border border-dashed border-[#d8c6b5] p-3 text-sm text-gray-500">
-                  No pending requests.
-                </p>
-              ) : null}
-              {incomingRequests.map((request) => (
-                <div
-                  key={request.id}
-                  className="rounded-lg border border-[#612014] bg-[#fff8f2] p-3"
-                >
-                  <p className="text-sm font-semibold text-[#231815]">
-                    {request.user.name}
-                  </p>
-                  <p className="text-xs text-gray-500">@{request.user.username}</p>
-                  <div className="mt-3 grid grid-cols-2 gap-2">
-                    <button
-                      type="button"
-                      onClick={() => handleRequestAction(request, 'accept')}
-                      disabled={requestActionId === request.id}
-                      className="rounded-lg bg-[#1f6f43] px-3 py-2 text-sm font-semibold text-white disabled:opacity-60"
-                    >
-                      Accept
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleRequestAction(request, 'decline')}
-                      disabled={requestActionId === request.id}
-                      className="rounded-lg border border-[#d8c6b5] px-3 py-2 text-sm font-semibold text-[#612014] disabled:opacity-60"
-                    >
-                      Decline
-                    </button>
-                  </div>
-                </div>
-              ))}
-              {outgoingRequests.map((request) => (
-                <div
-                  key={request.id}
-                  className="rounded-lg border border-[#eadfd5] bg-[#fffdfb] p-3"
-                >
-                  <p className="text-sm font-semibold text-[#231815]">
-                    {request.user.name}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    Pending acceptance from @{request.user.username}
-                  </p>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-6 space-y-2">
-              <h3 className="text-sm font-semibold uppercase text-gray-500">
-                Friends
+                Quick friends
               </h3>
               {friends.length === 0 ? (
                 <p className="rounded-lg border border-dashed border-[#d8c6b5] p-3 text-sm text-gray-500">
@@ -490,6 +502,29 @@ export default function DashboardPage() {
           </section>
 
           <section className="rounded-lg border border-[#dfd2c7] bg-white p-5 shadow-sm">
+            <div className="mb-5 grid grid-cols-3 rounded-lg border border-[#eadfd5] bg-[#fffdfb] p-1">
+              {([
+                ['messages', `Messages${unreadCount ? ` (${unreadCount})` : ''}`],
+                ['friends', `Friends${friends.length ? ` (${friends.length})` : ''}`],
+                ['requests', `Requests${incomingRequests.length ? ` (${incomingRequests.length})` : ''}`],
+              ] as [DashboardTab, string][]).map(([tab, label]) => (
+                <button
+                  key={tab}
+                  type="button"
+                  onClick={() => setActiveTab(tab)}
+                  className={`rounded-md px-3 py-2 text-sm font-semibold transition ${
+                    activeTab === tab
+                      ? 'bg-[#612014] text-white shadow-sm'
+                      : 'text-[#604b3d] hover:bg-[#f6ece3]'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            {activeTab === 'messages' ? (
+              <>
             <div className="flex flex-col gap-2 border-b border-[#eadfd5] pb-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="text-sm text-gray-500">Messaging</p>
@@ -605,6 +640,119 @@ export default function DashboardPage() {
                 ))
               )}
             </div>
+              </>
+            ) : null}
+
+            {activeTab === 'friends' ? (
+              <div className="space-y-4">
+                <div>
+                  <p className="text-sm text-gray-500">Accepted friends</p>
+                  <h2 className="text-xl font-bold text-[#231815]">
+                    People you can message
+                  </h2>
+                </div>
+                {friends.length === 0 ? (
+                  <p className="rounded-lg border border-dashed border-[#d8c6b5] p-4 text-sm text-gray-500">
+                    No accepted friends yet. Send a request from the left panel.
+                  </p>
+                ) : (
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {friends.map((friend) => (
+                      <button
+                        key={friend.id}
+                        type="button"
+                        onClick={() => {
+                          setSelectedFriendId(friend.id);
+                          setActiveTab('messages');
+                        }}
+                        className="rounded-lg border border-[#eadfd5] bg-[#fffdfb] p-4 text-left transition hover:border-[#612014] hover:bg-[#fff8f2]"
+                      >
+                        <span className="block font-semibold text-[#231815]">{friend.name}</span>
+                        <span className="block text-sm text-gray-500">@{friend.username}</span>
+                        <span className="mt-3 inline-flex rounded-full bg-[#f3eadf] px-3 py-1 text-xs font-semibold text-[#612014]">
+                          Message
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ) : null}
+
+            {activeTab === 'requests' ? (
+              <div className="space-y-5">
+                <div>
+                  <p className="text-sm text-gray-500">Friend requests</p>
+                  <h2 className="text-xl font-bold text-[#231815]">
+                    Accept or reject safely
+                  </h2>
+                </div>
+                <div className="space-y-3">
+                  <h3 className="text-sm font-semibold uppercase text-gray-500">
+                    Incoming
+                  </h3>
+                  {incomingRequests.length === 0 ? (
+                    <p className="rounded-lg border border-dashed border-[#d8c6b5] p-4 text-sm text-gray-500">
+                      No incoming requests.
+                    </p>
+                  ) : (
+                    incomingRequests.map((request) => (
+                      <article
+                        key={request.id}
+                        className="rounded-lg border border-[#612014] bg-[#fff8f2] p-4"
+                      >
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                          <div>
+                            <h4 className="font-semibold text-[#231815]">{request.user.name}</h4>
+                            <p className="text-sm text-gray-500">@{request.user.username} · {request.user.email}</p>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2 sm:w-56">
+                            <button
+                              type="button"
+                              onClick={() => handleRequestAction(request, 'accept')}
+                              disabled={requestActionId === request.id}
+                              className="rounded-lg bg-[#1f6f43] px-3 py-2 text-sm font-semibold text-white disabled:opacity-60"
+                            >
+                              Accept
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleRequestAction(request, 'decline')}
+                              disabled={requestActionId === request.id}
+                              className="rounded-lg border border-[#d8c6b5] bg-white px-3 py-2 text-sm font-semibold text-[#612014] disabled:opacity-60"
+                            >
+                              Reject
+                            </button>
+                          </div>
+                        </div>
+                      </article>
+                    ))
+                  )}
+                </div>
+                <div className="space-y-3">
+                  <h3 className="text-sm font-semibold uppercase text-gray-500">
+                    Sent
+                  </h3>
+                  {outgoingRequests.length === 0 ? (
+                    <p className="rounded-lg border border-dashed border-[#d8c6b5] p-4 text-sm text-gray-500">
+                      No sent requests waiting.
+                    </p>
+                  ) : (
+                    outgoingRequests.map((request) => (
+                      <article
+                        key={request.id}
+                        className="rounded-lg border border-[#eadfd5] bg-[#fffdfb] p-4"
+                      >
+                        <h4 className="font-semibold text-[#231815]">{request.user.name}</h4>
+                        <p className="text-sm text-gray-500">
+                          Waiting for @{request.user.username} to accept.
+                        </p>
+                      </article>
+                    ))
+                  )}
+                </div>
+              </div>
+            ) : null}
           </section>
         </div>
       </div>
