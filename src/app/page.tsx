@@ -2,11 +2,19 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import logo from "@/../public/rounded logo.svg";
 import { useI18n } from "@/i18n/I18nProvider";
 
 export default function Home() {
   const { t } = useI18n();
+  const [hasToken, setHasToken] = useState(false);
+
+  useEffect(() => {
+    setHasToken(Boolean(localStorage.getItem("token")));
+  }, []);
+
+  const startHref = hasToken ? "/dashboard" : "/login?mode=signup";
 
   return (
     <div className="relative overflow-hidden bg-[#f5efe6] text-[#221912]">
@@ -26,7 +34,7 @@ export default function Home() {
               {t("home.heroSubtitle")}
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/login?mode=signup" className="inline-flex cursor-pointer items-center rounded-full bg-[#2f1d13] px-6 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#4a2c1b]">
+              <Link href={startHref} className="inline-flex cursor-pointer items-center rounded-full bg-[#2f1d13] px-6 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#4a2c1b]">
                 {t("home.ctaStart")}
               </Link>
               <a href="#tiers" className="inline-flex cursor-pointer items-center rounded-full border border-[#d5bda2] bg-[#fff8ed] px-6 py-3 text-sm font-semibold text-[#4f2d1f] transition hover:bg-[#f5e7d5]">
@@ -122,7 +130,7 @@ export default function Home() {
           <h2 className="text-3xl font-semibold text-white sm:text-4xl">{t("home.ctaBandTitle")}</h2>
           <p className="mx-auto mt-3 max-w-[60ch] text-sm leading-7 text-[#f4e7dc] sm:text-base">{t("home.ctaBandBody")}</p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
-            <Link href="/login?mode=signup" className="inline-flex cursor-pointer items-center rounded-full bg-[#fff4e7] px-6 py-3 text-sm font-semibold text-[#4f2419] transition hover:bg-white">
+            <Link href={startHref} className="inline-flex cursor-pointer items-center rounded-full bg-[#fff4e7] px-6 py-3 text-sm font-semibold text-[#4f2419] transition hover:bg-white">
               {t("home.ctaBandStart")}
             </Link>
             <a href="#mission" className="inline-flex cursor-pointer items-center rounded-full border border-white/60 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10">

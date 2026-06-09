@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { Suspense, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { apiRequest } from '@/lib/api';
 import { useI18n } from '@/i18n/I18nProvider';
@@ -38,8 +38,40 @@ function LoginContent() {
   const [signupPassword, setSignupPassword] = useState('');
   const [signupError, setSignupError] = useState('');
   const [signupLoading, setSignupLoading] = useState(false);
+  const [checkingSession, setCheckingSession] = useState(true);
 
   const isSignup = searchParams.get('mode') === 'signup';
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function checkExistingSession() {
+      const token = localStorage.getItem('token');
+
+      if (!token) {
+        setCheckingSession(false);
+        return;
+      }
+
+      try {
+        await apiRequest('/auth/me');
+        if (mounted) {
+          router.replace('/dashboard');
+        }
+      } catch {
+        localStorage.removeItem('token');
+        if (mounted) {
+          setCheckingSession(false);
+        }
+      }
+    }
+
+    checkExistingSession();
+
+    return () => {
+      mounted = false;
+    };
+  }, [router]);
 
   function validateEmail(value: string): string | null {
     const email = value.trim();
@@ -145,6 +177,14 @@ function LoginContent() {
     signupName.trim().length > 0 &&
     signupEmail.trim().length > 0 &&
     signupPassword.length > 0;
+
+  if (checkingSession) {
+    return (
+      <main className="flex min-h-[calc(100vh-74px)] items-center justify-center bg-[#f7f2e9] text-sm font-semibold text-[#4f2d1f]">
+        {t('dashboard.loading')}
+      </main>
+    );
+  }
 
   return (
     <main className="relative min-h-[calc(100vh-74px)] overflow-hidden bg-gradient-to-br from-[#f7f2e9] via-[#f1e8db] to-[#e8dac8]">

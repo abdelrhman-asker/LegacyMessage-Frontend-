@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import MainLogo from "@/../public/d.svg";
 import { type Locale } from "@/i18n/config";
 import { useI18n } from "@/i18n/I18nProvider";
@@ -17,8 +17,13 @@ const navItems = [
 export default function GlobalNavbar() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [hasToken, setHasToken] = useState(false);
   const { t, locale, setLocale, localeLabels } = useI18n();
   const nextLocale: Locale = locale === "en" ? "ar" : "en";
+
+  useEffect(() => {
+    setHasToken(Boolean(localStorage.getItem("token")));
+  }, [pathname]);
 
   const isLanding = pathname === "/";
   const showMainNav =
@@ -70,9 +75,9 @@ export default function GlobalNavbar() {
           <span className={`lang-pill ${locale === "ar" ? "active" : ""}`}>{localeLabels.ar}</span>
         </button>
 
-        <Link href="/login" className="login-btn" onClick={() => setMenuOpen(false)}>
+        <Link href={hasToken ? "/dashboard" : "/login"} className="login-btn" onClick={() => setMenuOpen(false)}>
           <span className="login-lock" aria-hidden />
-          <span>{t("nav.login")}</span>
+          <span>{hasToken ? "Dashboard" : t("nav.login")}</span>
         </Link>
       </nav>
     </header>
