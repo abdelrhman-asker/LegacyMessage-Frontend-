@@ -5,8 +5,7 @@ import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { apiRequest } from '@/lib/api';
 import { useI18n } from '@/i18n/I18nProvider';
-import Loader, { LOADER_SRC } from '@/components/Loader';
-import DotLottie from '@/components/DotLottie';
+import Loader from '@/components/Loader';
 import waxLogo from '@/../public/wax-logo.png';
 
 type AuthResponse = {
@@ -210,11 +209,6 @@ function LoginContent() {
               </p>
             </div>
 
-            {/* Decorative animation — swap `src` with any lottie.host / .json URL. */}
-            <div className="relative flex justify-center py-4">
-              <DotLottie src={LOADER_SRC} className="float-y h-44 w-64" />
-            </div>
-
             <div className="relative space-y-4">
               <div className="rounded-2xl border border-[#cfaf90]/70 bg-white/45 px-4 py-3 text-sm text-[#553622]">
                 {t('login.side.point1')}
@@ -306,7 +300,13 @@ function LoginContent() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={null}>
+    <Suspense
+      fallback={
+        <main className="flex min-h-[calc(100vh-74px)] items-center justify-center bg-[#f7f2e9]">
+          <Loader />
+        </main>
+      }
+    >
       <LoginContent />
     </Suspense>
   );

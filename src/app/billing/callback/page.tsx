@@ -3,8 +3,13 @@
 import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { apiRequest } from '@/lib/api';
-import LottieAnim from '@/components/LottieAnim';
 import Loader from '@/components/Loader';
+import DotLottie from '@/components/DotLottie';
+
+const SUCCESS_ANIM =
+  'https://lottie.host/f762b25d-e821-4b54-950c-44aae99e0955/t2NG8QwI8E.json';
+const FAILED_ANIM =
+  'https://lottie.host/37ef82c6-34c9-45da-a1fc-17540419c4de/e1bHjlxDCR.json';
 
 type PaymentStatus = 'PENDING' | 'PAID' | 'FAILED';
 
@@ -107,42 +112,40 @@ function CallbackContent() {
       <div className="anim-pop relative w-full max-w-md overflow-hidden rounded-2xl border border-[#dfd2c7] bg-white p-6 text-center shadow-[0_24px_60px_rgba(50,27,12,0.12)]">
         {isSuccess ? (
           <>
-            <LottieAnim
-              src="/lottie/confetti.json"
+            <DotLottie
+              src={SUCCESS_ANIM}
               loop={false}
-              className="pointer-events-none absolute inset-0 z-0 h-full w-full opacity-90"
+              className="mx-auto h-40 w-40"
             />
-            <div className="relative z-10">
-              <LottieAnim
-                src="/lottie/success.json"
-                playOnce
-                className="mx-auto -mt-2 h-28 w-28"
-              />
-              <h1 className="text-2xl font-bold text-[#1f6f43]">
-                Payment successful
-              </h1>
-              <p className="mt-2 text-gray-600">
-                {detail?.unlimited
-                  ? 'Your account now has unlimited credits.'
-                  : `${detail?.credits ?? ''} credits have been added to your account.`}
-              </p>
+            <h1 className="text-2xl font-bold text-[#1f6f43]">
+              Payment successful
+            </h1>
+            <p className="mt-2 text-gray-600">
+              {detail?.unlimited
+                ? 'Your account now has unlimited credits.'
+                : `${detail?.credits ?? ''} credits have been added to your account.`}
+            </p>
             <p className="mt-4 text-sm text-gray-500">
               Redirecting to your dashboard in{' '}
               <span className="font-semibold text-[#1f6f43]">{redirectIn}s</span>
               …
             </p>
-              <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-[#e6ddd3]">
-                <div
-                  className="h-full rounded-full bg-[#1f6f43] transition-all duration-1000 ease-linear"
-                  style={{ width: `${(redirectIn / 5) * 100}%` }}
-                />
-              </div>
+            <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-[#e6ddd3]">
+              <div
+                className="h-full rounded-full bg-[#1f6f43] transition-all duration-1000 ease-linear"
+                style={{ width: `${(redirectIn / 5) * 100}%` }}
+              />
             </div>
           </>
         ) : null}
 
         {status === 'FAILED' ? (
           <>
+            <DotLottie
+              src={FAILED_ANIM}
+              loop={false}
+              className="mx-auto h-40 w-40"
+            />
             <h1 className="text-2xl font-bold text-[#612014]">Payment failed</h1>
             <p className="mt-2 text-gray-600">
               Your payment did not go through. No credits were added and you were
@@ -204,8 +207,8 @@ export default function BillingCallbackPage() {
   return (
     <Suspense
       fallback={
-        <main className="min-h-screen flex items-center justify-center bg-[#f3efeb]">
-          Loading...
+        <main className="flex min-h-screen items-center justify-center bg-[#f3efeb]">
+          <Loader />
         </main>
       }
     >
