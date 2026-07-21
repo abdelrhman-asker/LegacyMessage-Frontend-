@@ -4,7 +4,7 @@ import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiRequest } from '@/lib/api';
 import { useI18n } from '@/i18n/I18nProvider';
-import LottieAnim from '@/components/LottieAnim';
+import Loader from '@/components/Loader';
 
 type MeResponse = {
   user: {
@@ -394,10 +394,7 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <main className="flex min-h-screen flex-col items-center justify-center bg-[#f3efeb]">
-        <LottieAnim src="/lottie/loading.json" className="h-32 w-32" />
-        <p className="text-sm font-semibold text-[#6a5b52]">
-          {t('dashboard.loading')}
-        </p>
+        <Loader label={t('dashboard.loading')} />
       </main>
     );
   }

@@ -5,7 +5,8 @@ import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { apiRequest } from '@/lib/api';
 import { useI18n } from '@/i18n/I18nProvider';
-import LottieAnim from '@/components/LottieAnim';
+import Loader, { LOADER_SRC } from '@/components/Loader';
+import DotLottie from '@/components/DotLottie';
 import waxLogo from '@/../public/wax-logo.png';
 
 type AuthResponse = {
@@ -181,9 +182,8 @@ function LoginContent() {
 
   if (checkingSession) {
     return (
-      <main className="flex min-h-[calc(100vh-74px)] flex-col items-center justify-center bg-[#f7f2e9] text-sm font-semibold text-[#4f2d1f]">
-        <LottieAnim src="/lottie/loading.json" className="h-28 w-28" />
-        {t('dashboard.loading')}
+      <main className="flex min-h-[calc(100vh-74px)] flex-col items-center justify-center bg-[#f7f2e9]">
+        <Loader label={t('dashboard.loading')} />
       </main>
     );
   }
@@ -208,6 +208,11 @@ function LoginContent() {
               <p className="mt-5 max-w-[36ch] text-sm leading-relaxed text-[#6f4f37]">
                 {t('login.side.body')}
               </p>
+            </div>
+
+            {/* Decorative animation — swap `src` with any lottie.host / .json URL. */}
+            <div className="relative flex justify-center py-4">
+              <DotLottie src={LOADER_SRC} className="float-y h-44 w-64" />
             </div>
 
             <div className="relative space-y-4">

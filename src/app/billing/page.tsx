@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiRequest } from '@/lib/api';
-import LottieAnim from '@/components/LottieAnim';
+import Loader from '@/components/Loader';
 
 type CreditPackage = {
   id: string;
@@ -105,8 +105,7 @@ export default function BillingPage() {
   if (loading) {
     return (
       <main className="flex min-h-screen flex-col items-center justify-center bg-[#f3efeb]">
-        <LottieAnim src="/lottie/loading.json" className="h-32 w-32" />
-        <p className="text-sm font-semibold text-[#6a5b52]">Loading packages…</p>
+        <Loader label="Loading packages…" />
       </main>
     );
   }

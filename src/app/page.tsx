@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import logo from "@/../public/rounded logo.svg";
 import { useI18n } from "@/i18n/I18nProvider";
+import DotLottie from "@/components/DotLottie";
+import { LOADER_SRC } from "@/components/Loader";
 
 export default function Home() {
   const { t } = useI18n();
@@ -45,6 +47,8 @@ export default function Home() {
           </div>
 
           <div className="anim-fade-up anim-d2 relative rounded-3xl border border-[#e2d2bf] bg-gradient-to-b from-[#fffaf3] to-[#f1e3d2] p-6 shadow-[0_24px_60px_rgba(50,27,12,0.15)] sm:p-8">
+            {/* Decorative animation — swap `src` with any lottie.host / .json URL. */}
+            <DotLottie src={LOADER_SRC} className="float-y mx-auto mb-4 h-36 w-full max-w-[16rem]" />
             <p className="mb-5 text-xs font-semibold uppercase tracking-[0.2em] text-[#8f5a3c]">{t("home.howItWorks")}</p>
             <div className="space-y-4 text-sm text-[#493424]">
               <div className="hover-lift rounded-2xl border border-[#eadcca] bg-white/70 p-4">

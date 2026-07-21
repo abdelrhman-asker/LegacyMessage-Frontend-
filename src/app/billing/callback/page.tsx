@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { apiRequest } from '@/lib/api';
 import LottieAnim from '@/components/LottieAnim';
+import Loader from '@/components/Loader';
 
 type PaymentStatus = 'PENDING' | 'PAID' | 'FAILED';
 
@@ -152,10 +153,7 @@ function CallbackContent() {
 
         {isPending ? (
           <>
-            <LottieAnim
-              src="/lottie/loading.json"
-              className="mx-auto h-24 w-24"
-            />
+            <Loader className="mx-auto h-28 w-44" />
             <h1 className="text-2xl font-bold text-[#231815]">
               Confirming your payment...
             </h1>
