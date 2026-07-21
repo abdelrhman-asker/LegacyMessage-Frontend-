@@ -1,9 +1,7 @@
 'use client';
 
-import DotLottie from './DotLottie';
-
-/** Local public asset used by every loading state. */
-export const LOADER_SRC = '/lottie/loader.json';
+import Lottie from 'lottie-react';
+import loaderAnimation from '../../public/lottie/loader.json';
 
 type LoaderProps = {
   label?: string;
@@ -16,7 +14,13 @@ export default function Loader({
 }: LoaderProps) {
   return (
     <div className="flex flex-col items-center justify-center gap-2">
-      <DotLottie src={LOADER_SRC} className={className} />
+      <Lottie
+        animationData={loaderAnimation}
+        loop
+        autoplay
+        className={className}
+        aria-hidden
+      />
       {label ? (
         <p className="text-sm font-semibold text-[#6a5b52]">{label}</p>
       ) : null}

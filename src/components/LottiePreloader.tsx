@@ -6,6 +6,7 @@ import { LOTTIE_ASSETS, loadLottieData } from '@/lib/lottie-cache';
 export default function LottiePreloader() {
   useEffect(() => {
     function warmCache() {
+      void import('@/components/Loader');
       void import('@lottiefiles/dotlottie-react');
       LOTTIE_ASSETS.forEach((src) => {
         void loadLottieData(src).catch(() => undefined);

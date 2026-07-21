@@ -1,7 +1,6 @@
 const CACHE_NAME = 'lastdot-lottie-v1';
 
 export const LOTTIE_ASSETS = [
-  '/lottie/loader.json',
   '/lottie/pay-success.json',
   '/lottie/pay-failed.json',
 ] as const;
