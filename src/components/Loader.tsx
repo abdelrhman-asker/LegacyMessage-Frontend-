@@ -2,9 +2,8 @@
 
 import DotLottie from './DotLottie';
 
-/** Swap this URL to change the loading animation everywhere. */
-export const LOADER_SRC =
-  'https://lottie.host/f8b6b9d1-546f-42ff-9107-bfa063b12ba0/8B6k4fKuIu.json';
+/** Local public asset used by every loading state. */
+export const LOADER_SRC = '/lottie/loader.json';
 
 type LoaderProps = {
   label?: string;

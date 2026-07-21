@@ -6,10 +6,8 @@ import { apiRequest } from '@/lib/api';
 import Loader from '@/components/Loader';
 import DotLottie from '@/components/DotLottie';
 
-const SUCCESS_ANIM =
-  'https://lottie.host/f762b25d-e821-4b54-950c-44aae99e0955/t2NG8QwI8E.json';
-const FAILED_ANIM =
-  'https://lottie.host/37ef82c6-34c9-45da-a1fc-17540419c4de/e1bHjlxDCR.json';
+const SUCCESS_ANIM = '/lottie/pay-success.json';
+const FAILED_ANIM = '/lottie/pay-failed.json';
 
 type PaymentStatus = 'PENDING' | 'PAID' | 'FAILED';
 
