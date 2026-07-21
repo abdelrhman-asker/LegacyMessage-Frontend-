@@ -13,6 +13,7 @@ type MeResponse = {
     username: string;
     credits?: {
       balance: number;
+      unlimited?: boolean;
     };
   };
 };
@@ -82,6 +83,7 @@ type SendMessageResponse = {
   message: Message;
   credits?: {
     balance: number;
+    unlimited?: boolean;
   } | null;
 };
 
@@ -208,9 +210,12 @@ export default function DashboardPage() {
   }, [messages, selectedFriendId]);
 
   const creditBalance = user?.credits?.balance ?? 0;
+  const isUnlimited = user?.credits?.unlimited ?? false;
   const unreadCount = messages.filter((message) => message.unread).length;
   const canSendMessage =
-    Boolean(selectedFriendId) && messageContent.trim().length > 0 && creditBalance > 0;
+    Boolean(selectedFriendId) &&
+    messageContent.trim().length > 0 &&
+    (isUnlimited || creditBalance > 0);
 
   async function handleAddFriend(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -429,13 +434,24 @@ export default function DashboardPage() {
           </button>
         ) : null}
 
-        <div className="grid gap-5 lg:grid-cols-[340px_1fr]">
+        <div className="grid gap-5 lg:grid-cols-[1fr]">
           <section className="rounded-lg border border-[#dfd2c7] bg-white p-5 shadow-sm">
             <div className="mb-5 grid grid-cols-3 gap-3">
-              <div className="rounded-lg border border-[#eadfd5] bg-[#fffdfb] p-3">
+              <div className="flex flex-col rounded-lg border border-[#eadfd5] bg-[#fffdfb] p-3">
                 <p className="text-sm text-gray-500">{t('dashboard.credits')}</p>
-                <h2 className="text-2xl font-bold text-[#231815]">{creditBalance}</h2>
-                <p className="text-xs text-gray-500">1 message = 1 credit</p>
+                <h2 className="text-2xl font-bold text-[#231815]">
+                  {isUnlimited ? '∞' : creditBalance}
+                </h2>
+                <p className="text-xs text-gray-500">
+                  {isUnlimited ? 'Unlimited credits' : '1 message = 1 credit'}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => router.push('/billing')}
+                  className="mt-2 self-start rounded-lg border border-[#612014] px-3 py-1 text-xs font-semibold text-[#612014] hover:bg-[#fff8f2]"
+                >
+                  {isUnlimited ? 'Manage credits' : 'Buy credits'}
+                </button>
               </div>
               <div className="rounded-lg border border-[#eadfd5] bg-[#fff8f2] p-3">
                 <p className="text-sm text-gray-500">Unread</p>
@@ -449,8 +465,10 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            <form className="space-y-3 rounded-lg border border-[#eadfd5] bg-[#fffdfb] p-4" onSubmit={handleAddFriend}>
-              <label className="block text-sm font-semibold text-gray-700" htmlFor="friendIdentifier">
+            <form className="space-y-3 rounded-lg border border-[#eadfd5] bg-[#fffdfb] p-4 grid lg:grid-cols-[0.75fr_0.25fr] gap-2" onSubmit={handleAddFriend}>
+            <div className="!m-0">
+
+              <label className="block text-sm mb-2 font-semibold text-gray-700" htmlFor="friendIdentifier">
                 Send friend request
               </label>
               <input
@@ -461,10 +479,11 @@ export default function DashboardPage() {
                 placeholder="email or username"
                 disabled={friendLoading}
               />
+              </div>
               <button
                 type="submit"
                 disabled={friendLoading}
-                className="buttonMain w-full rounded-lg px-4 py-2 disabled:opacity-60"
+                className="buttonMain self-end w-full max-h-fit rounded-lg px-4 py-2 disabled:opacity-60"
               >
                 {friendLoading ? 'Sending...' : 'Send request'}
               </button>
@@ -569,7 +588,11 @@ export default function DashboardPage() {
               />
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-sm text-gray-500">
-                  {creditBalance > 0 ? `${creditBalance} credits available` : 'No credits available'}
+                  {isUnlimited
+                    ? 'Unlimited credits'
+                    : creditBalance > 0
+                      ? `${creditBalance} credits available`
+                      : 'No credits available'}
                 </p>
                 <button
                   type="submit"
