@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { apiRequest } from '@/lib/api';
+import LottieAnim from '@/components/LottieAnim';
 
 type PaymentStatus = 'PENDING' | 'PAID' | 'FAILED';
 
@@ -32,6 +33,7 @@ function CallbackContent() {
   const [detail, setDetail] = useState<PaymentStatusResponse['payment'] | null>(
     null,
   );
+  const [redirectIn, setRedirectIn] = useState(5);
 
   useEffect(() => {
     if (!paymentId) {
@@ -83,22 +85,58 @@ function CallbackContent() {
     };
   }, [paymentId]);
 
+  // On success, count down and auto-redirect to the dashboard.
+  useEffect(() => {
+    if (status !== 'PAID') {
+      return;
+    }
+    if (redirectIn <= 0) {
+      router.push('/dashboard');
+      return;
+    }
+    const timer = window.setTimeout(() => setRedirectIn((n) => n - 1), 1000);
+    return () => window.clearTimeout(timer);
+  }, [status, redirectIn, router]);
+
   const isSuccess = status === 'PAID';
   const isPending = status === 'PENDING' || status === 'TIMEOUT';
 
   return (
     <main className="min-h-screen bg-[#f3efeb] p-4 sm:p-6 flex items-center justify-center">
-      <div className="w-full max-w-md rounded-lg border border-[#dfd2c7] bg-white p-6 text-center shadow-sm">
+      <div className="anim-pop relative w-full max-w-md overflow-hidden rounded-2xl border border-[#dfd2c7] bg-white p-6 text-center shadow-[0_24px_60px_rgba(50,27,12,0.12)]">
         {isSuccess ? (
           <>
-            <h1 className="text-2xl font-bold text-[#1f6f43]">
-              Payment successful
-            </h1>
-            <p className="mt-2 text-gray-600">
-              {detail?.unlimited
-                ? 'Your account now has unlimited credits.'
-                : `${detail?.credits ?? ''} credits have been added to your account.`}
+            <LottieAnim
+              src="/lottie/confetti.json"
+              loop={false}
+              className="pointer-events-none absolute inset-0 z-0 h-full w-full opacity-90"
+            />
+            <div className="relative z-10">
+              <LottieAnim
+                src="/lottie/success.json"
+                playOnce
+                className="mx-auto -mt-2 h-28 w-28"
+              />
+              <h1 className="text-2xl font-bold text-[#1f6f43]">
+                Payment successful
+              </h1>
+              <p className="mt-2 text-gray-600">
+                {detail?.unlimited
+                  ? 'Your account now has unlimited credits.'
+                  : `${detail?.credits ?? ''} credits have been added to your account.`}
+              </p>
+            <p className="mt-4 text-sm text-gray-500">
+              Redirecting to your dashboard in{' '}
+              <span className="font-semibold text-[#1f6f43]">{redirectIn}s</span>
+              …
             </p>
+              <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-[#e6ddd3]">
+                <div
+                  className="h-full rounded-full bg-[#1f6f43] transition-all duration-1000 ease-linear"
+                  style={{ width: `${(redirectIn / 5) * 100}%` }}
+                />
+              </div>
+            </div>
           </>
         ) : null}
 
@@ -114,6 +152,10 @@ function CallbackContent() {
 
         {isPending ? (
           <>
+            <LottieAnim
+              src="/lottie/loading.json"
+              className="mx-auto h-24 w-24"
+            />
             <h1 className="text-2xl font-bold text-[#231815]">
               Confirming your payment...
             </h1>

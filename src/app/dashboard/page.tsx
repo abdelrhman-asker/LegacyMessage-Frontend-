@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiRequest } from '@/lib/api';
 import { useI18n } from '@/i18n/I18nProvider';
+import LottieAnim from '@/components/LottieAnim';
 
 type MeResponse = {
   user: {
@@ -392,8 +393,11 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen flex items-center justify-center">
-        {t('dashboard.loading')}
+      <main className="flex min-h-screen flex-col items-center justify-center bg-[#f3efeb]">
+        <LottieAnim src="/lottie/loading.json" className="h-32 w-32" />
+        <p className="text-sm font-semibold text-[#6a5b52]">
+          {t('dashboard.loading')}
+        </p>
       </main>
     );
   }
@@ -401,14 +405,14 @@ export default function DashboardPage() {
   return (
     <main className="min-h-screen bg-[#f3efeb] p-4 sm:p-6">
       <div className="mx-auto max-w-6xl space-y-5">
-        <div className="flex flex-col gap-4 rounded-lg border border-[#dfd2c7] bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+        <div className="anim-fade-up flex flex-col gap-4 rounded-2xl border border-[#dfd2c7] bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold">{t('dashboard.welcome', { name: user?.name ?? 'User' })}</h1>
             <p className="text-gray-500">{user?.email}</p>
             <p className="mt-1 text-sm font-semibold text-[#612014]">@{user?.username}</p>
           </div>
 
-          <button onClick={() => { localStorage.removeItem('token'); router.push('/login'); }} className="buttonMain rounded-lg border px-4 py-2">
+          <button onClick={() => { localStorage.removeItem('token'); router.push('/login'); }} className="buttonMain shine hover-pop rounded-lg border px-4 py-2">
             {t('dashboard.logout')}
           </button>
         </div>
@@ -435,9 +439,9 @@ export default function DashboardPage() {
         ) : null}
 
         <div className="grid gap-5 lg:grid-cols-[1fr]">
-          <section className="rounded-lg border border-[#dfd2c7] bg-white p-5 shadow-sm">
+          <section className="reveal rounded-2xl border border-[#dfd2c7] bg-white p-5 shadow-sm">
             <div className="mb-5 grid grid-cols-3 gap-3">
-              <div className="flex flex-col rounded-lg border border-[#eadfd5] bg-[#fffdfb] p-3">
+              <div className="anim-pop anim-d1 hover-lift flex flex-col rounded-2xl border border-[#eadfd5] bg-[#fffdfb] p-3">
                 <p className="text-sm text-gray-500">{t('dashboard.credits')}</p>
                 <h2 className="text-2xl font-bold text-[#231815]">
                   {isUnlimited ? '∞' : creditBalance}
@@ -448,17 +452,17 @@ export default function DashboardPage() {
                 <button
                   type="button"
                   onClick={() => router.push('/billing')}
-                  className="mt-2 self-start rounded-lg border border-[#612014] px-3 py-1 text-xs font-semibold text-[#612014] hover:bg-[#fff8f2]"
+                  className="hover-pop mt-2 self-start rounded-lg border border-[#612014] px-3 py-1 text-xs font-semibold text-[#612014] hover:bg-[#fff8f2]"
                 >
                   {isUnlimited ? 'Manage credits' : 'Buy credits'}
                 </button>
               </div>
-              <div className="rounded-lg border border-[#eadfd5] bg-[#fff8f2] p-3">
+              <div className="anim-pop anim-d2 hover-lift rounded-2xl border border-[#eadfd5] bg-[#fff8f2] p-3">
                 <p className="text-sm text-gray-500">Unread</p>
                 <h2 className="text-2xl font-bold text-[#612014]">{unreadCount}</h2>
                 <p className="text-xs text-gray-500">new messages</p>
               </div>
-              <div className="rounded-lg border border-[#eadfd5] bg-[#fffdfb] p-3">
+              <div className="anim-pop anim-d3 hover-lift rounded-2xl border border-[#eadfd5] bg-[#fffdfb] p-3">
                 <p className="text-sm text-gray-500">Requests</p>
                 <h2 className="text-2xl font-bold text-[#231815]">{incomingRequests.length}</h2>
                 <p className="text-xs text-gray-500">waiting</p>
@@ -520,7 +524,7 @@ export default function DashboardPage() {
             </div>
           </section>
 
-          <section className="rounded-lg border border-[#dfd2c7] bg-white p-5 shadow-sm">
+          <section className="reveal rounded-2xl border border-[#dfd2c7] bg-white p-5 shadow-sm">
             <div className="mb-5 grid grid-cols-3 rounded-lg border border-[#eadfd5] bg-[#fffdfb] p-1">
               {([
                 ['messages', `Messages${unreadCount ? ` (${unreadCount})` : ''}`],

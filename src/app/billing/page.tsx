@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiRequest } from '@/lib/api';
+import LottieAnim from '@/components/LottieAnim';
 
 type CreditPackage = {
   id: string;
@@ -103,16 +104,19 @@ export default function BillingPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-[#f3efeb]">
-        Loading packages...
+      <main className="flex min-h-screen flex-col items-center justify-center bg-[#f3efeb]">
+        <LottieAnim src="/lottie/loading.json" className="h-32 w-32" />
+        <p className="text-sm font-semibold text-[#6a5b52]">Loading packages…</p>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-[#f3efeb] p-4 sm:p-6">
-      <div className="mx-auto max-w-4xl space-y-5">
-        <div className="flex flex-col gap-3 rounded-lg border border-[#dfd2c7] bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+    <main className="relative min-h-screen overflow-hidden bg-[#f3efeb] p-4 sm:p-6">
+      <div className="blob-float pointer-events-none absolute -left-24 top-10 h-72 w-72 rounded-full bg-[#c88f62]/15 blur-3xl" />
+      <div className="blob-float-2 pointer-events-none absolute -right-24 bottom-10 h-72 w-72 rounded-full bg-[#7a2a21]/10 blur-3xl" />
+      <div className="relative mx-auto max-w-4xl space-y-5">
+        <div className="reveal flex flex-col gap-3 rounded-2xl border border-[#dfd2c7] bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold text-[#231815]">Add credits</h1>
             <p className="text-gray-500">
@@ -140,12 +144,12 @@ export default function BillingPage() {
         ) : null}
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {packages.map((pkg) => {
+          {packages.map((pkg, i) => {
             const highlighted = pkg.unlimited;
             return (
               <div
                 key={pkg.id}
-                className={`flex flex-col rounded-lg border p-5 shadow-sm ${
+                className={`reveal reveal-d${(i % 4) + 1} hover-lift flex flex-col rounded-2xl border p-5 shadow-sm ${
                   highlighted
                     ? 'border-[#612014] bg-[#fff8f2]'
                     : 'border-[#dfd2c7] bg-white'
@@ -167,7 +171,7 @@ export default function BillingPage() {
                   type="button"
                   onClick={() => handleBuy(pkg)}
                   disabled={Boolean(buyingId)}
-                  className="buttonMain mt-5 rounded-lg px-4 py-2 disabled:opacity-60"
+                  className="buttonMain shine hover-pop mt-5 rounded-lg px-4 py-2 disabled:opacity-60"
                 >
                   {buyingId === pkg.id ? 'Redirecting...' : 'Buy'}
                 </button>

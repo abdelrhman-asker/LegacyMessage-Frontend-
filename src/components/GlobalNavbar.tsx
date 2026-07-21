@@ -37,7 +37,7 @@ export default function GlobalNavbar() {
   }
 
   return (
-    <header className="top-nav" role="banner">
+    <header className="top-nav anim-fade-in" role="banner">
       <div className="nav-head">
         <div className="brand-wrap">
           <Link href="/" aria-label="Lastdot Home" className="brand-name" onClick={() => setMenuOpen(false)}>
@@ -75,7 +75,7 @@ export default function GlobalNavbar() {
           <span className={`lang-pill ${locale === "ar" ? "active" : ""}`}>{localeLabels.ar}</span>
         </button>
 
-        <Link href={hasToken ? "/dashboard" : "/login"} className="login-btn" onClick={() => setMenuOpen(false)}>
+        <Link href={hasToken ? "/dashboard" : "/login"} className="login-btn shine hover-pop" onClick={() => setMenuOpen(false)}>
           <span className="login-lock" aria-hidden />
           <span>{hasToken ? "Dashboard" : t("nav.login")}</span>
         </Link>

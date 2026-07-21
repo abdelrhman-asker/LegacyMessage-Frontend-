@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Inter } from "next/font/google";
 import GlobalNavbar from "@/components/GlobalNavbar";
+import ScrollReveal from "@/components/ScrollReveal";
 import { I18nProvider } from "@/i18n/I18nProvider";
 import "./globals.css";
 
@@ -33,6 +34,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <I18nProvider>
+          <ScrollReveal />
           <GlobalNavbar />
           {children}
         </I18nProvider>

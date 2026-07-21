@@ -18,43 +18,44 @@ export default function Home() {
 
   return (
     <div className="relative overflow-hidden bg-[#f5efe6] text-[#221912]">
-      <div className="pointer-events-none absolute -left-24 -top-16 h-72 w-72 rounded-full bg-[#c88f62]/20 blur-3xl" />
-      <div className="pointer-events-none absolute -right-20 top-40 h-72 w-72 rounded-full bg-[#7a2a21]/10 blur-3xl" />
+      <div className="blob-float pointer-events-none absolute -left-24 -top-16 h-72 w-72 rounded-full bg-[#c88f62]/20 blur-3xl" />
+      <div className="blob-float-2 pointer-events-none absolute -right-20 top-40 h-72 w-72 rounded-full bg-[#7a2a21]/10 blur-3xl" />
+      <div className="blob-float pointer-events-none absolute bottom-20 left-1/3 h-64 w-64 rounded-full bg-[#c88f62]/10 blur-3xl" />
 
       <section id="top" className="relative mx-auto w-full max-w-6xl px-4 pb-16 pt-10 sm:px-6 lg:px-8 lg:pt-14">
         <div className="grid items-center gap-10 lg:grid-cols-[1.08fr_0.92fr]">
           <div>
-            <p className="mb-4 inline-flex rounded-full border border-[#d9c6ae] bg-[#fff8ee] px-4 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#6a2a1f]">
+            <p className="anim-fade-up mb-4 inline-flex rounded-full border border-[#d9c6ae] bg-[#fff8ee] px-4 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#6a2a1f]">
               {t("home.badge")}
             </p>
-            <h1 className="max-w-[14ch] text-4xl font-semibold leading-[1.05] text-[#25170f] sm:text-5xl lg:text-6xl">
+            <h1 className="anim-fade-up anim-d1 max-w-[14ch] text-4xl font-semibold leading-[1.05] text-[#25170f] sm:text-5xl lg:text-6xl">
               {t("home.heroTitle")}
             </h1>
-            <p className="mt-5 max-w-[52ch] text-sm leading-7 text-[#614c3d] sm:text-base">
+            <p className="anim-fade-up anim-d2 mt-5 max-w-[52ch] text-sm leading-7 text-[#614c3d] sm:text-base">
               {t("home.heroSubtitle")}
             </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link href={startHref} className="inline-flex cursor-pointer items-center rounded-full bg-[#2f1d13] px-6 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#4a2c1b]">
+            <div className="anim-fade-up anim-d3 mt-8 flex flex-wrap gap-3">
+              <Link href={startHref} className="shine hover-pop inline-flex cursor-pointer items-center rounded-full bg-[#2f1d13] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#4a2c1b]">
                 {t("home.ctaStart")}
               </Link>
-              <a href="#tiers" className="inline-flex cursor-pointer items-center rounded-full border border-[#d5bda2] bg-[#fff8ed] px-6 py-3 text-sm font-semibold text-[#4f2d1f] transition hover:bg-[#f5e7d5]">
+              <a href="#tiers" className="hover-pop inline-flex cursor-pointer items-center rounded-full border border-[#d5bda2] bg-[#fff8ed] px-6 py-3 text-sm font-semibold text-[#4f2d1f] transition hover:bg-[#f5e7d5]">
                 {t("home.ctaPlans")}
               </a>
             </div>
           </div>
 
-          <div className="relative rounded-3xl border border-[#e2d2bf] bg-gradient-to-b from-[#fffaf3] to-[#f1e3d2] p-6 shadow-[0_24px_60px_rgba(50,27,12,0.15)] sm:p-8">
+          <div className="anim-fade-up anim-d2 relative rounded-3xl border border-[#e2d2bf] bg-gradient-to-b from-[#fffaf3] to-[#f1e3d2] p-6 shadow-[0_24px_60px_rgba(50,27,12,0.15)] sm:p-8">
             <p className="mb-5 text-xs font-semibold uppercase tracking-[0.2em] text-[#8f5a3c]">{t("home.howItWorks")}</p>
             <div className="space-y-4 text-sm text-[#493424]">
-              <div className="rounded-2xl border border-[#eadcca] bg-white/70 p-4">
+              <div className="hover-lift rounded-2xl border border-[#eadcca] bg-white/70 p-4">
                 <p className="font-semibold">{t("home.step1Title")}</p>
                 <p className="mt-1 text-[#6b5545]">{t("home.step1Body")}</p>
               </div>
-              <div className="rounded-2xl border border-[#eadcca] bg-white/70 p-4">
+              <div className="hover-lift rounded-2xl border border-[#eadcca] bg-white/70 p-4">
                 <p className="font-semibold">{t("home.step2Title")}</p>
                 <p className="mt-1 text-[#6b5545]">{t("home.step2Body")}</p>
               </div>
-              <div className="rounded-2xl border border-[#eadcca] bg-white/70 p-4">
+              <div className="hover-lift rounded-2xl border border-[#eadcca] bg-white/70 p-4">
                 <p className="font-semibold">{t("home.step3Title")}</p>
                 <p className="mt-1 text-[#6b5545]">{t("home.step3Body")}</p>
               </div>
@@ -65,20 +66,20 @@ export default function Home() {
 
       <main className="space-y-14 pb-16">
         <section id="mission" className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
-          <div className="rounded-3xl border border-[#e3d4c3] bg-[#fffaf4] p-6 shadow-[0_18px_50px_rgba(54,30,12,0.08)] sm:p-9">
+          <div className="reveal rounded-3xl border border-[#e3d4c3] bg-[#fffaf4] p-6 shadow-[0_18px_50px_rgba(54,30,12,0.08)] sm:p-9">
             <h2 className="text-3xl font-semibold text-[#2b1c13] sm:text-4xl">{t("home.missionTitle")}</h2>
             <p className="mt-4 text-justify text-sm leading-7 text-[#625141] sm:text-base">{t("home.missionBody")}</p>
             <p className="mt-4 text-justify text-sm leading-7 text-[#625141] sm:text-base">{t("home.missionBody2")}</p>
             <div className="mt-7 grid gap-4 sm:grid-cols-3">
-              <article className="rounded-2xl border border-[#eadcca] bg-white p-4">
+              <article className="reveal reveal-d1 hover-lift rounded-2xl border border-[#eadcca] bg-white p-4">
                 <h3 className="font-semibold text-[#362318]">{t("home.pillarIntentTitle")}</h3>
                 <p className="mt-1 text-sm text-[#685442]">{t("home.pillarIntentBody")}</p>
               </article>
-              <article className="rounded-2xl border border-[#eadcca] bg-white p-4">
+              <article className="reveal reveal-d2 hover-lift rounded-2xl border border-[#eadcca] bg-white p-4">
                 <h3 className="font-semibold text-[#362318]">{t("home.pillarSecurityTitle")}</h3>
                 <p className="mt-1 text-sm text-[#685442]">{t("home.pillarSecurityBody")}</p>
               </article>
-              <article className="rounded-2xl border border-[#eadcca] bg-white p-4">
+              <article className="reveal reveal-d3 hover-lift rounded-2xl border border-[#eadcca] bg-white p-4">
                 <h3 className="font-semibold text-[#362318]">{t("home.pillarContinuityTitle")}</h3>
                 <p className="mt-1 text-sm text-[#685442]">{t("home.pillarContinuityBody")}</p>
               </article>
@@ -87,12 +88,12 @@ export default function Home() {
         </section>
 
         <section id="tiers" className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-6">
+          <div className="reveal mb-6">
             <h2 className="text-3xl font-semibold text-[#2b1c13] sm:text-4xl">{t("home.tiersTitle")}</h2>
             <p className="mt-2 text-sm text-[#675342] sm:text-base">{t("home.tiersSubtitle")}</p>
           </div>
           <div className="grid gap-4 lg:grid-cols-3">
-            <article className="rounded-3xl border border-[#e2d1bd] bg-[#fff8f0] p-6">
+            <article className="reveal reveal-d1 hover-lift rounded-3xl border border-[#e2d1bd] bg-[#fff8f0] p-6">
               <h3 className="text-xl font-semibold text-[#2a1a12]">{t("home.plan1Title")}</h3>
               <p className="mt-1 text-xs uppercase tracking-[0.12em] text-[#866247]">{t("home.plan1Tag")}</p>
               <ul className="mt-4 space-y-2 text-sm text-[#5f4b3c]">
@@ -126,14 +127,14 @@ export default function Home() {
       </main>
 
       <section className="mx-auto mb-12 w-full max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div className="rounded-3xl bg-gradient-to-r from-[#4f2318] to-[#7a3124] px-6 py-10 text-center sm:px-10">
+        <div className="reveal reveal-scale gradient-animate rounded-3xl bg-gradient-to-r from-[#4f2318] via-[#7a3124] to-[#4f2318] px-6 py-10 text-center sm:px-10">
           <h2 className="text-3xl font-semibold text-white sm:text-4xl">{t("home.ctaBandTitle")}</h2>
           <p className="mx-auto mt-3 max-w-[60ch] text-sm leading-7 text-[#f4e7dc] sm:text-base">{t("home.ctaBandBody")}</p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
-            <Link href={startHref} className="inline-flex cursor-pointer items-center rounded-full bg-[#fff4e7] px-6 py-3 text-sm font-semibold text-[#4f2419] transition hover:bg-white">
+            <Link href={startHref} className="shine hover-pop inline-flex cursor-pointer items-center rounded-full bg-[#fff4e7] px-6 py-3 text-sm font-semibold text-[#4f2419] transition hover:bg-white">
               {t("home.ctaBandStart")}
             </Link>
-            <a href="#mission" className="inline-flex cursor-pointer items-center rounded-full border border-white/60 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10">
+            <a href="#mission" className="hover-pop inline-flex cursor-pointer items-center rounded-full border border-white/60 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10">
               {t("home.ctaBandLearn")}
             </a>
           </div>

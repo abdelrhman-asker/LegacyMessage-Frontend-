@@ -209,3 +209,151 @@ html[dir="rtl"] .nav-links {
     flex: 1;
   }
 }
+
+/* ===================================================================
+   Motion system — bold but tasteful, warm-palette friendly.
+   Scroll reveals are driven by ScrollReveal.tsx toggling `.in`.
+   =================================================================== */
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(26px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes popIn {
+  0%   { opacity: 0; transform: scale(0.82); }
+  60%  { opacity: 1; transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+@keyframes blobDrift {
+  0%   { transform: translate(0, 0) scale(1); }
+  33%  { transform: translate(34px, -26px) scale(1.08); }
+  66%  { transform: translate(-22px, 22px) scale(0.94); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+@keyframes floatY {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-14px); }
+}
+@keyframes gradientShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+@keyframes shimmer {
+  0%   { transform: translateX(-160%) skewX(-18deg); }
+  100% { transform: translateX(320%) skewX(-18deg); }
+}
+@keyframes drawRing {
+  from { stroke-dashoffset: 176; }
+  to   { stroke-dashoffset: 0; }
+}
+@keyframes checkPop {
+  0%   { transform: scale(0); opacity: 0; }
+  60%  { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+/* --- Scroll reveal (observed by ScrollReveal.tsx) --- */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 0.61, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+  will-change: opacity, transform;
+}
+.reveal.reveal-left  { transform: translateX(-36px); }
+.reveal.reveal-right { transform: translateX(36px); }
+.reveal.reveal-scale { transform: scale(0.9); }
+.reveal.in { opacity: 1; transform: none; }
+
+.reveal-d1 { transition-delay: 0.08s; }
+.reveal-d2 { transition-delay: 0.16s; }
+.reveal-d3 { transition-delay: 0.24s; }
+.reveal-d4 { transition-delay: 0.32s; }
+.reveal-d5 { transition-delay: 0.40s; }
+.reveal-d6 { transition-delay: 0.48s; }
+
+/* --- On-mount entrances (above-the-fold, no observer needed) --- */
+.anim-fade-up { animation: fadeUp 0.85s cubic-bezier(0.22, 0.61, 0.36, 1) both; }
+.anim-fade-in { animation: fadeIn 0.9s ease both; }
+.anim-pop     { animation: popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.anim-d1 { animation-delay: 0.1s; }
+.anim-d2 { animation-delay: 0.22s; }
+.anim-d3 { animation-delay: 0.34s; }
+.anim-d4 { animation-delay: 0.46s; }
+.anim-d5 { animation-delay: 0.58s; }
+
+/* --- Ambient motion --- */
+.blob-float   { animation: blobDrift 20s ease-in-out infinite; }
+.blob-float-2 { animation: blobDrift 26s ease-in-out infinite reverse; }
+.float-y      { animation: floatY 6s ease-in-out infinite; }
+.gradient-animate { background-size: 220% 220%; animation: gradientShift 7s ease infinite; }
+
+/* --- Hover micro-interactions --- */
+.hover-lift {
+  transition:
+    transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1),
+    box-shadow 0.35s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-6px) scale(1.015);
+  box-shadow: 0 26px 52px rgba(50, 27, 12, 0.18);
+}
+.hover-pop { transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.hover-pop:hover { transform: translateY(-2px) scale(1.045); }
+
+/* Sheen sweep on hover (add to buttons) */
+.shine { position: relative; overflow: hidden; }
+.shine::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 45%;
+  height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transform: translateX(-160%) skewX(-18deg);
+  pointer-events: none;
+}
+.shine:hover::after { animation: shimmer 0.9s ease; }
+
+/* Grow-from-center underline (nav / links) */
+.link-underline { position: relative; }
+.link-underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  height: 2px;
+  width: 100%;
+  background: currentColor;
+  border-radius: 99px;
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.link-underline:hover::after { transform: scaleX(1); }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal.in {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .anim-fade-up,
+  .anim-fade-in,
+  .anim-pop,
+  .blob-float,
+  .blob-float-2,
+  .float-y,
+  .gradient-animate,
+  .shine::after {
+    animation: none !important;
+  }
+}

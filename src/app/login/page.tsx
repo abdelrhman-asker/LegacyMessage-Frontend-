@@ -5,6 +5,7 @@ import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { apiRequest } from '@/lib/api';
 import { useI18n } from '@/i18n/I18nProvider';
+import LottieAnim from '@/components/LottieAnim';
 import waxLogo from '@/../public/wax-logo.png';
 
 type AuthResponse = {
@@ -180,7 +181,8 @@ function LoginContent() {
 
   if (checkingSession) {
     return (
-      <main className="flex min-h-[calc(100vh-74px)] items-center justify-center bg-[#f7f2e9] text-sm font-semibold text-[#4f2d1f]">
+      <main className="flex min-h-[calc(100vh-74px)] flex-col items-center justify-center bg-[#f7f2e9] text-sm font-semibold text-[#4f2d1f]">
+        <LottieAnim src="/lottie/loading.json" className="h-28 w-28" />
         {t('dashboard.loading')}
       </main>
     );
@@ -188,8 +190,8 @@ function LoginContent() {
 
   return (
     <main className="relative min-h-[calc(100vh-74px)] overflow-hidden bg-gradient-to-br from-[#f7f2e9] via-[#f1e8db] to-[#e8dac8]">
-      <div className="pointer-events-none absolute left-[-120px] top-[-80px] h-64 w-64 rounded-full bg-[#d9bc9a]/35 blur-3xl sm:h-96 sm:w-96" />
-      <div className="pointer-events-none absolute bottom-[-140px] right-[-100px] h-64 w-64 rounded-full bg-[#b9895d]/30 blur-3xl sm:h-[28rem] sm:w-[28rem]" />
+      <div className="blob-float pointer-events-none absolute left-[-120px] top-[-80px] h-64 w-64 rounded-full bg-[#d9bc9a]/35 blur-3xl sm:h-96 sm:w-96" />
+      <div className="blob-float-2 pointer-events-none absolute bottom-[-140px] right-[-100px] h-64 w-64 rounded-full bg-[#b9895d]/30 blur-3xl sm:h-[28rem] sm:w-[28rem]" />
       <div className="mx-auto flex min-h-[calc(100vh-74px)] w-full max-w-6xl items-center px-4 py-3 sm:px-6 sm:py-4 md:py-5 lg:px-8">
         <div className="grid w-full overflow-hidden rounded-[28px] border border-[#e7d8c6]/90 bg-[#fffbf5]/90 shadow-[0_30px_80px_rgba(47,26,10,0.16)] backdrop-blur-sm lg:grid-cols-[1.05fr_0.95fr]">
           <section className="relative hidden overflow-hidden border-r border-[#eadbc9] bg-gradient-to-b from-[#ead7c2] to-[#e3ccb1] p-10 lg:flex lg:flex-col lg:justify-between">
