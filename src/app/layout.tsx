@@ -5,6 +5,8 @@ import ScrollReveal from "@/components/ScrollReveal";
 import { I18nProvider } from "@/i18n/I18nProvider";
 import "./globals.css";
 
+import LottiePreloader from '@/components/LottiePreloader';
+
 const cormorant = Cormorant_Garamond({
   variable: "--font-cormorant",
   subsets: ["latin"],
@@ -33,6 +35,7 @@ export default function RootLayout({
       className={`${cormorant.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        <LottiePreloader />
         <I18nProvider>
           <ScrollReveal />
           <GlobalNavbar />

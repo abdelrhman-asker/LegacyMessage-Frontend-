@@ -472,6 +472,9 @@ export default function DashboardPage() {
               <label className="block text-sm mb-2 font-semibold text-gray-700" htmlFor="friendIdentifier">
                 Send friend request
               </label>
+                {friendStatus ? (
+                <p className="text-sm text-[#612014]">{friendStatus}</p>
+              ) : null}
               <input
                 id="friendIdentifier"
                 value={friendIdentifier}
@@ -488,9 +491,6 @@ export default function DashboardPage() {
               >
                 {friendLoading ? 'Sending...' : 'Send request'}
               </button>
-              {friendStatus ? (
-                <p className="text-sm text-[#612014]">{friendStatus}</p>
-              ) : null}
             </form>
 
             <div className="mt-6 space-y-2">

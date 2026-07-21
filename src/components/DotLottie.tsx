@@ -1,6 +1,11 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import { useEffect, useState } from 'react';
+import {
+  getLoadedLottieData,
+  loadLottieData,
+} from '@/lib/lottie-cache';
 
 // Load the player client-side only — it touches canvas/WebAssembly, so it must
 // never run during static prerender.
@@ -29,14 +34,44 @@ export default function DotLottie({
   autoplay = true,
   className,
 }: DotLottieProps) {
+  const [animation, setAnimation] = useState(() => ({
+    src,
+    data: getLoadedLottieData(src),
+  }));
+  const [failedSrc, setFailedSrc] = useState<string>();
+
+  useEffect(() => {
+    let active = true;
+
+    loadLottieData(src)
+      .then((data) => {
+        if (active) {
+          setAnimation({ src, data });
+        }
+      })
+      .catch(() => {
+        if (active) {
+          setFailedSrc(src);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [src]);
+
+  const data = animation.src === src ? animation.data : undefined;
+
   return (
     <div className={className} aria-hidden>
-      <DotLottieReact
-        src={src}
-        loop={loop}
-        autoplay={autoplay}
-        style={{ width: '100%', height: '100%' }}
-      />
+      {data || failedSrc === src ? (
+        <DotLottieReact
+          {...(data ? { data } : { src })}
+          loop={loop}
+          autoplay={autoplay}
+          style={{ width: '100%', height: '100%' }}
+        />
+      ) : null}
     </div>
   );
 }
